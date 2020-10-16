@@ -115,7 +115,8 @@ public enum DockProgress {
 			NSBezierPath(roundedRect: rect, cornerRadius: rect.height / 2).fill()
 		}
 
-		let bar = CGRect(x: 0, y: 20, width: dstRect.width, height: 10)
+		// 바 위치 조절
+		let bar = CGRect(x: 10, y: 30, width: dstRect.width - 20, height: 10)
 		NSColor.white.withAlpha(0.8).set()
 		roundedRect(bar)
 
