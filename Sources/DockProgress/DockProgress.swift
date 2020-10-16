@@ -44,6 +44,14 @@ public enum DockProgress {
 
 	public static var progress: Double = 0 {
 		didSet {
+			/**
+			원본은 0.01 이하의 변화량일 경우, 독 아이콘을 업데이트하지 않기 때문에 완료시에도 업데이트가 일어나지 않는 경우가 발생한다
+			따라서 1인 경우 무조건 업데이트 실행하도록 변경
+			*/
+			if progress == 1 {
+				return updateDockIcon()
+			}
+			// 이외의 경우
 			if previousProgress == 0 || (progress - previousProgress).magnitude > 0.01 {
 				previousProgress = progress
 				updateDockIcon()
