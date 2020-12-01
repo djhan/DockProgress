@@ -19,10 +19,8 @@ public enum DockProgress {
 			}
 
 			progressObserver = progressInstance.observe(\.fractionCompleted) { sender, _ in
-				guard
-					!sender.isCancelled,
-					!sender.isFinished
-				else {
+				guard sender.isCancelled == false,
+					sender.isFinished == false else {
 					return
 				}
 
@@ -31,9 +29,9 @@ public enum DockProgress {
 
 			finishedObserver = progressInstance.observe(\.isFinished) { sender, _ in
 				guard
-					!sender.isCancelled,
-					sender.isFinished
-				else {
+					// 취소시 종료 처리
+					//!sender.isCancelled,
+					sender.isFinished == true else {
 					return
 				}
 
@@ -116,7 +114,7 @@ public enum DockProgress {
 		}
 
 		// 바 위치 조절
-		let bar = CGRect(x: 10, y: 30, width: dstRect.width - 20, height: 10)
+		let bar = CGRect(x: 10, y: dstRect.height / 2 - 5, width: dstRect.width - 20, height: 10)
 		NSColor.white.withAlpha(0.8).set()
 		roundedRect(bar)
 
