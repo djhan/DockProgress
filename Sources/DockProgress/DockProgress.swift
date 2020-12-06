@@ -23,8 +23,9 @@ public enum DockProgress {
 					sender.isFinished == false else {
 					return
 				}
-
-				progress = sender.fractionCompleted
+				DispatchQueue.main.async {
+					progress = sender.fractionCompleted
+				}
 			}
 
 			finishedObserver = progressInstance.observe(\.isFinished) { sender, _ in
@@ -34,8 +35,9 @@ public enum DockProgress {
 					sender.isFinished == true else {
 					return
 				}
-
-				progress = 1
+				DispatchQueue.main.async {
+					progress = 1
+				}
 			}
 		}
 	}
