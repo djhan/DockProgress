@@ -23,21 +23,17 @@ public enum DockProgress {
 					sender.isFinished == false else {
 					return
 				}
-				DispatchQueue.main.async {
-					progress = sender.fractionCompleted
-				}
+
+				progress = sender.fractionCompleted
 			}
 
 			finishedObserver = progressInstance.observe(\.isFinished) { sender, _ in
-				guard
-					// 취소시 종료 처리
-					//!sender.isCancelled,
-					sender.isFinished == true else {
+				// 취소시에도 정상적으로 종료 처리한다
+				guard sender.isFinished == true  else {
 					return
 				}
-				DispatchQueue.main.async {
-					progress = 1
-				}
+
+				progress = 1
 			}
 		}
 	}
@@ -68,6 +64,7 @@ public enum DockProgress {
 
 	public enum ProgressStyle {
 		case bar
+		case squircle(inset: Double? = nil, color: NSColor = .controlAccentColorPolyfill)
 		case circle(radius: Double, color: NSColor = .controlAccentColorPolyfill)
 		case badge(color: NSColor = .controlAccentColorPolyfill, badgeValue: () -> Int)
 		case custom(drawHandler: (_ rect: CGRect) -> Void)
@@ -98,6 +95,8 @@ public enum DockProgress {
 			switch self.style {
 			case .bar:
 				self.drawProgressBar(dstRect)
+			case .squircle(let inset, let color):
+				self.drawProgressSquircle(dstRect, inset: inset, color: color)
 			case .circle(let radius, let color):
 				self.drawProgressCircle(dstRect, radius: radius, color: color)
 			case .badge(let color, let badgeValue):
@@ -115,8 +114,7 @@ public enum DockProgress {
 			NSBezierPath(roundedRect: rect, cornerRadius: rect.height / 2).fill()
 		}
 
-		// 바 위치 조절
-		let bar = CGRect(x: 10, y: dstRect.height / 2 - 5, width: dstRect.width - 20, height: 10)
+		let bar = CGRect(x: 0, y: 20, width: dstRect.width, height: 10)
 		NSColor.white.withAlpha(0.8).set()
 		roundedRect(bar)
 
@@ -130,6 +128,26 @@ public enum DockProgress {
 		roundedRect(barProgress)
 	}
 
+	private static func drawProgressSquircle(_ dstRect: CGRect, inset: Double? = nil, color: NSColor) {
+		guard let cgContext = NSGraphicsContext.current?.cgContext else {
+			return
+		}
+
+		let defaultInset: CGFloat = 14.4
+
+		var rect = dstRect.insetBy(dx: defaultInset, dy: defaultInset)
+
+		if let inset = inset {
+			rect = rect.insetBy(dx: CGFloat(inset), dy: CGFloat(inset))
+		}
+
+		let progressSquircle = ProgressSquircleShapeLayer(rect: rect)
+		progressSquircle.strokeColor = color.cgColor
+		progressSquircle.lineWidth = 5
+		progressSquircle.progress = progress
+		progressSquircle.render(in: cgContext)
+	}
+
 	private static func drawProgressCircle(_ dstRect: CGRect, radius: Double, color: NSColor) {
 		guard let cgContext = NSGraphicsContext.current?.cgContext else {
 			return
@@ -138,7 +156,6 @@ public enum DockProgress {
 		let progressCircle = ProgressCircleShapeLayer(radius: radius, center: dstRect.center)
 		progressCircle.strokeColor = color.cgColor
 		progressCircle.lineWidth = 4
-		progressCircle.cornerRadius = 3
 		progressCircle.progress = progress
 		progressCircle.render(in: cgContext)
 	}
