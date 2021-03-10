@@ -25,6 +25,7 @@ public enum DockProgress {
 				}
 
 				progress = sender.fractionCompleted
+				print("DockProgress>progressInstance: progress = \(progress)")
 			}
 
 			finishedObserver = progressInstance.observe(\.isFinished) { sender, _ in
