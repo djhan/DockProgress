@@ -21,6 +21,8 @@ public enum DockProgress {
 			progressObserver = progressInstance.observe(\.fractionCompleted) { sender, _ in
 				guard sender.isCancelled == false,
 					sender.isFinished == false else {
+					// 종료 처리
+					progress = 1
 					return
 				}
 
@@ -29,8 +31,8 @@ public enum DockProgress {
 			}
 
 			finishedObserver = progressInstance.observe(\.isFinished) { sender, _ in
-				// 취소시에도 정상적으로 종료 처리한다
-				guard sender.isFinished == true  else {
+				// 취소로 인한 종료시에도 정상적으로 종료 처리한다
+				guard sender.isFinished == true else {
 					return
 				}
 
