@@ -3,6 +3,7 @@ import Cocoa
 public enum DockProgress {
 	private static var previousProgress: Double = 0
 	private static var progressObserver: NSKeyValueObservation?
+	private static var cancelObserver: NSKeyValueObservation?
 	private static var finishedObserver: NSKeyValueObservation?
 
 	private static let dockImageView = with(NSImageView()) {
@@ -12,7 +13,9 @@ public enum DockProgress {
 	public static weak var progressInstance: Progress? {
 		didSet {
 			guard let progressInstance = progressInstance else {
+				print("DockProgress>progressInstance: 해제")
 				progressObserver = nil
+				cancelObserver = nil
 				finishedObserver = nil
 				resetProgress()
 				return
@@ -21,21 +24,30 @@ public enum DockProgress {
 			progressObserver = progressInstance.observe(\.fractionCompleted) { sender, _ in
 				guard sender.isCancelled == false,
 					sender.isFinished == false else {
+					print("DockProgress>progressInstance: 취소 또는 종료")
 					// 종료 처리
 					progress = 1
 					return
 				}
-
 				progress = sender.fractionCompleted
 				//print("DockProgress>progressInstance: progress = \(progress)")
 			}
 
+			cancelObserver = progressInstance.observe(\.isCancelled) { sender, _ in
+				// 취소 발생 여부 확인
+				guard sender.isCancelled == true else {
+					return
+				}
+				print("DockProgress>progressInstance: 취소 처리")
+				progress = 1
+			}
+			
 			finishedObserver = progressInstance.observe(\.isFinished) { sender, _ in
 				// 취소로 인한 종료시에도 정상적으로 종료 처리한다
 				guard sender.isFinished == true else {
 					return
 				}
-
+				print("DockProgress>progressInstance: 종료 처리")
 				progress = 1
 			}
 		}
