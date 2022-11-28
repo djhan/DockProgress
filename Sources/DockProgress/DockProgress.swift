@@ -21,7 +21,7 @@ public enum DockProgress {
 				return
 			}
 
-			progressObserver = progressInstance.observe(\.fractionCompleted) { sender, _ in
+			progressObserver = progressInstance.observe(\.fractionCompleted, options: [.initial, .new]) { sender, _ in
 				guard sender.isCancelled == false,
 					sender.isFinished == false else {
 					print("DockProgress>progressInstance: 취소 또는 종료")
@@ -33,7 +33,7 @@ public enum DockProgress {
 				//print("DockProgress>progressInstance: progress = \(progress)")
 			}
 
-			cancelObserver = progressInstance.observe(\.isCancelled) { sender, _ in
+			cancelObserver = progressInstance.observe(\.isCancelled, options: [.new]) { sender, _ in
 				// 취소 발생 여부 확인
 				guard sender.isCancelled == true else {
 					return
@@ -42,7 +42,7 @@ public enum DockProgress {
 				progress = 1
 			}
 			
-			finishedObserver = progressInstance.observe(\.isFinished) { sender, _ in
+			finishedObserver = progressInstance.observe(\.isFinished, options: [.new]) { sender, _ in
 				// 취소로 인한 종료시에도 정상적으로 종료 처리한다
 				guard sender.isFinished == true else {
 					return
