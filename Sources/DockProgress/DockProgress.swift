@@ -24,7 +24,7 @@ public enum DockProgress {
 			progressObserver = progressInstance.observe(\.fractionCompleted, options: [.initial, .new]) { sender, _ in
 				guard sender.isCancelled == false,
 					sender.isFinished == false else {
-					print("DockProgress>progressInstance: 취소 또는 종료")
+					// print("DockProgress>progressInstance: 취소 또는 종료")
 					// 종료 처리
 					progress = 1
 					return
